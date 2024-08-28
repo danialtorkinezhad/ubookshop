@@ -9,128 +9,134 @@ import WindowFloat from "../Libs/WindowFloat";
 import "./css.module.css";
 import Block from "./Block";
 
-
-
-
-
 export default (p) => Component(p, Page);
 const Page: PageEl = (props, state, refresh, getProps) => {
   let styles = global.styles;
-  let name = "کتاب ها";
-  let name2 = "سبد خرید";
+  let sum = 0;
+  let count = 0;
+  state.faves = Array.from(new Set(state.faves))
+  for (let faves of state.faves) {
+    let book = props.books.find(ketab => ketab.title == faves)
+    if (book) { sum = sum + (book.price) * 0.9 }
+    count = count + 1;
+  }
+
+
+
 
   return (
-    <div style={{ direction: "rtl", minHeight: "11vh" }}>
+    <div style={{ direction: "rtl", minHeight: "11vh", backgroundColor: "GrayText" }}>
       <br-x />
+
+
+      <c-cc>
+        <Window title=' سبد خرید ' style={{ height: 150, width: "97%", fontFamily: "vrb", backgroundColor: " lightgray" }}>
+          <f-cse style={{ paddingTop: 35 }}>
+
+
+            <f-cc style={{ backgroundColor: "white", height: "60px", width: "30%", borderRadius: "8px", boxShadow: "15px 15px 20px" }}> <img src="https://irmapserver.ir/research/77/money.png"
+              style={{ width: "3rem" }}></img> &nbsp; <f-20 style={{ fontFamily: "vrb" }}> مجموع پرداخت : {sum.toLocaleString("fa-IR")} </f-20>
+            </f-cc>
+
+            <f-cc style={{ backgroundColor: "white", height: "60px", width: "30%", borderRadius: "8px", boxShadow: "15px 15px 20px" }}> <img src="https://irmapserver.ir/research/77/book.png"
+              style={{ width: "3rem" }}></img> &nbsp; <f-20 style={{ fontFamily: "vrb" }}> تعداد کتاب : {count.toLocaleString("fa-IR")} </f-20>
+            </f-cc>
+
+
+          </f-cse>
+        </Window>
+      </c-cc>
+
+
+
+
+
+
 
       {state.form == "details" ? (
         <WindowFloat
-          title="details"
+          style={{ fontSize: 15, fontFamily: "vrb" }}
+          title="اطلاعات کتاب"
           onclose={() => {
-            delete state.form
+            delete state.form;
             refresh();
           }}
         >
           <f-c>
-            <f-15>title: </f-15>
+            <f-15 >نام کتاب : </f-15>
             <sp-2 />
             <f-15>{state.book.title}</f-15>
           </f-c>
 
           <f-c>
-            <f-15>author: </f-15>
+            <f-15>نویسنده : </f-15>
             <sp-2 />
             <f-15>{state.book.author}</f-15>
           </f-c>
 
           <f-c>
-            <f-15>country: </f-15>
+            <f-15>کشور : </f-15>
             <sp-2 />
             <f-15>{state.book.country}</f-15>
           </f-c>
 
           <f-c>
-            <f-15>language: </f-15>
+            <f-15>زبان : </f-15>
             <sp-2 />
             <f-15>{state.book.language}</f-15>
           </f-c>
 
           <f-c>
-            <f-15>pages: </f-15>
+            <f-15>تعداد صحفات : </f-15>
             <sp-2 />
             <f-15>{state.book.pages}</f-15>
           </f-c>
 
           <g-b
-            style={{ backgroundColor: "#717774" }}
+            style={{ backgroundColor: "darkgreen" }}
             onClick={() => {
               if (!state.faves) {
                 state.faves = [];
               }
-              state.faves.push(state.book.title);
 
-              state.form = null;
+
+              if (state.faves.includes(state.book.title)) {
+                state.faves = state.faves.filter(item => item !== state.book.title)
+                state.form = null
+              } else {
+                state.faves.push(state.book.title)
+                state.form = null
+              }
+
               refresh();
             }}
           >
-            <img
-              src="https://irmapserver.ir/research/33/check.png"
-              style={{ height: 20, width: 20, objectFit: "contain" }}
-            />
+            <f-15 style={{ color: "lightgray", fontFamily: "vrb" }}> خرید </f-15>
           </g-b>
         </WindowFloat>
-      ) : null}
-
-      <Window
-        title={name2}
-        style={{ minHeight: 200, margin: 10, width: "calc(100% - 20px)" }}
+      ) : null}<Window
+        title={" کتاب ها  "}
+        style={{
+          minHeight: 200, margin: 10, width: "calc(100% - 20px)", fontFamily: "vrb", backgroundColor: " lightgray",
+          // backgroundImage: 'url(${ "https://cdn.prod.website-files.com/5f64854a08f25af4fc8763b6/622b2a8c5ae8dd46d414abf1_bookshop.jpg"})'
+        }}
       >
-        <w-sec>
-          
-        </w-sec>
-      </Window>
-
-      <Window
-        title={name}
-        style={{ minHeight: 200, margin: 10, width: "calc(100% - 20px)" }}
-      >
-        <w-cse style={{}}>
+        <w-cse style={{ gap: 30 }}>
           {props.books.map((book) => {
-            return <Block
-            book = {book}
-            state = {state}
-            refresh = {refresh}/>
+            return <Block book={book} state={state} refresh={refresh} />;
           })}
         </w-cse>
       </Window>
     </div>
-  );
-};
+  )
+}
 
 export async function getServerSideProps(context) {
-  var session = await global.SSRVerify(context);
-  var {
-    uid,
-    name,
-    image,
-    imageprop,
-    lang,
-    cchar,
-    unit,
-    workspace,
-    servid,
-    servsecret,
-    usedquota,
-    quota,
-    quotaunit,
-    status,
-    regdate,
-    expid,
-    role,
-    path,
-    devmod,
-    userip,
-  } = session;
+  var session = await global.SSRVerify(context)
+  var { uid, name, image, imageprop, lang, cchar,
+    unit, workspace, servid, servsecret,
+    usedquota, quota, quotaunit, status, regdate, expid,
+    role, path, devmod, userip, } = session;
 
   let books = await global.db.collection("books").find({}).toArray();
 
